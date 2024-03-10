@@ -1,3 +1,69 @@
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  background-color: antiquewhite;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  margin: 50px;
+}
+
+#board {
+  height: 400px;
+  width: 400px;
+  background-color: antiquewhite;
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0px 0px 50px rgb(100, 100, 100);
+}
+
+.cell {
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.beige {
+  background-color: beige;
+  height: 50px;
+  width: 50px;
+}
+
+.green {
+  background-color: green;
+  height: 50px;
+  width: 50px;
+}
+
+.piece {
+  height: 75%;
+  width: 75%;
+}
+
+h5 {
+  margin-top: 20px;
+}
+
+p {
+  font-size: 0.4rem;
+  position: absolute;
+  left: 0.1rem;
+  bottom: 0.1rem;
 }
