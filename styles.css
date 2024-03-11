@@ -40,6 +40,10 @@ h1 {
   position: relative;
 }
 
+.selected {
+  background-color: burlywood !important;
+}
+
 .beige {
   background-color: beige;
   height: 50px;

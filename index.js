@@ -9,19 +9,26 @@ let turn = true;
 
 let selectedPiece = null;
 let selectedCell = null;
+let legalMove = null;
 
-let blackKing = new King("black");
-let blackQueen = new Queen("black");
-let blackRook = new Rook("black");
-let blackBishop = new Bishop("black");
-let blackKnight = new Knight("black");
-let blackPawn = new Pawn("black");
-let whiteKing = new King("white");
-let whiteQueen = new Queen("white");
-let whiteRook = new Rook("white");
-let whiteBishop = new Bishop("white");
-let whiteKnight = new Knight("white");
-let whitePawn = new Pawn("white");
+let blackKing = new King("king", "black");
+let blackQueen = new Queen("queen", "black");
+let blackRook = new Rook("rook", "black");
+let blackBishop = new Bishop("bishop", "black");
+let blackKnight = new Knight("knight", "black");
+let blackPawn = new Pawn("pawn", "black");
+let whiteKing = new King("king", "white");
+let whiteQueen = new Queen("queen", "white");
+let whiteRook = new Rook("rook", "white");
+let whiteBishop = new Bishop("bishop", "white");
+let whiteKnight = new Knight("knight", "white");
+let whitePawn = new Pawn("pawn", "white");
+
+// prettier-ignore
+const piecesClass = {
+  blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn,
+  whiteKing, whiteQueen, whiteRook, whiteBishop, whiteKnight, whitePawn,
+};
 
 function startGame() {
   renderBoard();
@@ -33,18 +40,12 @@ function renderBoard() {
     "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
     "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
-    "", "", "", "", "", "", "", "",
-    "", "", "", "", "", "", "", "",
+    "", "", "", "whiteKing", "", "blackKing", "", "",
+    "", "", "whiteRook", "", "", "blackRook", "", "",
     "", "", "", "", "", "", "", "",
     "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
     "whiteRook", "whiteBishop", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
   ];
-
-  // prettier-ignore
-  const pieces = {
-    blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn,
-    whiteKing, whiteQueen, whiteRook, whiteBishop, whiteKnight, whitePawn,
-  };
 
   // Iterate over the startPosition array to create the board
   for (let i = 0; i < startingPosition.length; i++) {
@@ -76,7 +77,7 @@ function renderBoard() {
     // Place pieces on the board
     const pieceName = startingPosition[i];
     if (pieceName !== "") {
-      const piece = pieces[pieceName].renderPiece(pieceName);
+      const piece = piecesClass[pieceName].renderPiece(pieceName);
       cell.append(piece);
     }
 
@@ -99,6 +100,7 @@ function movePieces(cell) {
   // Check if a piece not already assigned to selectedPiece variable
   if (!selectedPiece) {
     const piece = cell.querySelector(".piece");
+    const pieceName = piece.classList[1];
 
     // Check if there is a piece in the cell
     if (piece) {
@@ -114,10 +116,27 @@ function movePieces(cell) {
       // Compare piece color to turn
       // If equal, move piece ; if not equal, refuse move
       if (pieceColor === checkTurn()) {
+        // Retrieve isValidMove method
+        console.log(pieceName);
+        const validMove = piecesClass[pieceName].checkValidMove(
+          pieceName,
+          pieceColor,
+          cellX,
+          cellY
+        );
+
+        // Assign legaMove variable to validMove
+        legalMove = validMove;
+        console.log(legalMove);
+        for (const move of legalMove) {
+          console.log(move);
+        }
+
+        // Assign the temporary variables
         selectedPiece = piece;
         selectedCell = cell;
-        information.innerText = `Selected piece: ${cellXName}${cellYName}`;
-        console.log(`Selected piece: { x: ${cellX}, y: ${cellY} }`);
+        information.innerText = `${pieceName} selected: ${cellXName}${cellYName}`;
+        console.log(`${pieceName} selected: { x: ${cellX}, y: ${cellY} }`);
       } else {
         information.innerText = "Not your turn";
         console.log("Not your turn");
@@ -136,20 +155,35 @@ function movePieces(cell) {
   }
 
   // Add selected piece to target cell
-  cell.appendChild(selectedPiece);
-  information.innerText = `Piece moved: ${cellXName}${cellYName}`;
-  console.log(`Piece moved: { x: ${cellX}, y: ${cellY} }`);
+  const selectedCellX = cell.dataset.x;
+  const selectedCellY = cell.dataset.y;
+  const selectedCellPosition = { x: +selectedCellX, y: +selectedCellY };
 
-  // Change piece coordinates based on target cell
-  selectedPiece.dataset.x = cellX;
-  selectedPiece.dataset.y = cellY;
+  const isLegalMove = legalMove.find((oneLegalMove) =>
+    samePosition(oneLegalMove, selectedCellPosition)
+  );
+  console.log(`Move accepted`);
 
-  // Put selected cell and selected piece to null again for next turn
-  selectedPiece = null;
-  selectedCell = null;
+  if (isLegalMove) {
+    cell.appendChild(selectedPiece);
+    const piece = cell.querySelector(".piece");
+    const pieceName = piece.classList[1];
+    information.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
+    console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
+    // Change piece coordinates based on target cell
+    selectedPiece.dataset.x = cellX;
+    selectedPiece.dataset.y = cellY;
 
-  // Change turn
-  turn = !turn;
+    // Put selected cell and selected piece to null again for next turn
+    selectedPiece = null;
+    selectedCell = null;
+
+    // Change turn
+    turn = !turn;
+  } else {
+    information.innerText = "Not a valid move";
+    console.log("Error");
+  }
 }
 
 function checkTurn() {
@@ -159,6 +193,10 @@ function checkTurn() {
   } else {
     return "black";
   }
+}
+
+function samePosition(legalMove, selectedCellPosition) {
+  return JSON.stringify(legalMove) === JSON.stringify(selectedCellPosition);
 }
 
 startGame();
