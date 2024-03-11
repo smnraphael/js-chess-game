@@ -40,8 +40,8 @@ function renderBoard() {
     "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
     "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
-    "", "", "", "whiteKing", "", "blackKing", "", "",
-    "", "", "whiteRook", "", "", "blackRook", "", "",
+    "", "", "", "whiteKing", "", "whiteBishop", "", "",
+    "", "", "whiteRook", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
     "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
     "whiteRook", "whiteBishop", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
@@ -100,13 +100,12 @@ function movePieces(cell) {
   // Check if a piece not already assigned to selectedPiece variable
   if (!selectedPiece) {
     const piece = cell.querySelector(".piece");
-    const pieceName = piece.classList[1];
-
-    // Check if there is a piece in the cell
     if (piece) {
-      let pieceColor = "";
+      // Find piece name for later use
+      const pieceName = piece.classList[1];
 
       // Check the piece color
+      let pieceColor = "";
       if (piece.classList.contains("white")) {
         pieceColor = "white";
       } else {
@@ -116,8 +115,7 @@ function movePieces(cell) {
       // Compare piece color to turn
       // If equal, move piece ; if not equal, refuse move
       if (pieceColor === checkTurn()) {
-        // Retrieve isValidMove method
-        console.log(pieceName);
+        // Retrieve checkValidMove method
         const validMove = piecesClass[pieceName].checkValidMove(
           pieceName,
           pieceColor,
@@ -125,22 +123,25 @@ function movePieces(cell) {
           cellY
         );
 
-        // Assign legaMove variable to validMove
-        legalMove = validMove;
-        console.log(legalMove);
-        for (const move of legalMove) {
-          console.log(move);
-        }
-
         // Assign the temporary variables
         selectedPiece = piece;
         selectedCell = cell;
         information.innerText = `${pieceName} selected: ${cellXName}${cellYName}`;
         console.log(`${pieceName} selected: { x: ${cellX}, y: ${cellY} }`);
+
+        // Assign legalMove variable to validMove
+        legalMove = validMove;
+        console.log(legalMove);
+        for (const move of legalMove) {
+          console.log(move);
+        }
       } else {
         information.innerText = "Not your turn";
         console.log("Not your turn");
       }
+    } else {
+      information.innerText = "Select a piece";
+      console.log("Select a piece");
     }
     return;
   }
@@ -159,17 +160,19 @@ function movePieces(cell) {
   const selectedCellY = cell.dataset.y;
   const selectedCellPosition = { x: +selectedCellX, y: +selectedCellY };
 
+  // Compare target cell to valid moves
   const isLegalMove = legalMove.find((oneLegalMove) =>
     samePosition(oneLegalMove, selectedCellPosition)
   );
-  console.log(`Move accepted`);
 
   if (isLegalMove) {
+    // Move the piece to the new cell
     cell.appendChild(selectedPiece);
     const piece = cell.querySelector(".piece");
     const pieceName = piece.classList[1];
     information.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
     console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
+
     // Change piece coordinates based on target cell
     selectedPiece.dataset.x = cellX;
     selectedPiece.dataset.y = cellY;
@@ -182,7 +185,7 @@ function movePieces(cell) {
     turn = !turn;
   } else {
     information.innerText = "Not a valid move";
-    console.log("Error");
+    console.log("Not a valid move");
   }
 }
 
