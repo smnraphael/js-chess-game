@@ -2,6 +2,7 @@ import { King, Queen, Rook, Bishop, Knight, Pawn } from "./src/pieces.js";
 
 const board = document.querySelector("#board");
 const information = document.querySelector("#information");
+const cemetery = document.querySelector("#cemetery");
 const cells = document.querySelectorAll(".cell");
 const pieces = document.querySelectorAll(".piece");
 
@@ -146,7 +147,7 @@ function movePieces(cell) {
     return;
   }
 
-  // Delesect a piece when clicking on it twice
+  // Deselect a piece when clicking on it twice
   if (cell === selectedCell) {
     selectedPiece = null;
     selectedCell = null;
@@ -166,23 +167,40 @@ function movePieces(cell) {
   );
 
   if (isLegalMove) {
-    // Move the piece to the new cell
-    cell.appendChild(selectedPiece);
-    const piece = cell.querySelector(".piece");
-    const pieceName = piece.classList[1];
-    information.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
-    console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
+    // Check if the target cell contains a piece
+    const targetPiece = cell.querySelector(".piece");
+    if (!targetPiece || !hasSameColor(selectedPiece, targetPiece)) {
+      // Move the piece to the new cell
+      cell.appendChild(selectedPiece);
 
-    // Change piece coordinates based on target cell
-    selectedPiece.dataset.x = cellX;
-    selectedPiece.dataset.y = cellY;
+      // Check if there is a piece in the target cell to move it to cemetery
+      if (targetPiece) {
+        cell.removeChild(targetPiece);
+        cemetery.appendChild(targetPiece);
+      }
 
-    // Put selected cell and selected piece to null again for next turn
-    selectedPiece = null;
-    selectedCell = null;
+      // Display the move on the screen
+      const pieceName = selectedPiece.classList[1];
+      information.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
+      console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
 
-    // Change turn
-    turn = !turn;
+      // Change piece coordinates based on target cell
+      selectedPiece.dataset.x = cellX;
+      selectedPiece.dataset.y = cellY;
+
+      // Put selected cell and selected piece to null again for next turn
+      selectedPiece = null;
+      selectedCell = null;
+
+      // Change turn
+      turn = !turn;
+    } else {
+      selectedPiece = null;
+      selectedCell = null;
+      information.innerText = "Not a valid move";
+      console.log("Not a valid move");
+      return;
+    }
   } else {
     information.innerText = "Not a valid move";
     console.log("Not a valid move");
@@ -200,6 +218,25 @@ function checkTurn() {
 
 function samePosition(legalMove, selectedCellPosition) {
   return JSON.stringify(legalMove) === JSON.stringify(selectedCellPosition);
+}
+
+function hasSameColor(piece, targetPiece) {
+  let pieceColor = "";
+  let targetPieceColor = "";
+
+  if (piece.classList.contains("white")) {
+    pieceColor = "white";
+  } else {
+    pieceColor = "black";
+  }
+
+  if (targetPiece.classList.contains("white")) {
+    targetPieceColor = "white";
+  } else {
+    targetPieceColor = "black";
+  }
+
+  return pieceColor === targetPieceColor;
 }
 
 startGame();
