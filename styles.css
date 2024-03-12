@@ -67,3 +67,7 @@ p {
   left: 0.1rem;
   bottom: 0.1rem;
 }
+
+.selected {
+  background-color: red;
+}
