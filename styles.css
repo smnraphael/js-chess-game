@@ -30,6 +30,10 @@ h1 {
   align-items: center;
 }
 
+.margin {
+  height: 150px;
+}
+
 #board {
   height: 400px;
   width: 400px;
@@ -63,8 +67,8 @@ h1 {
 }
 
 .piece {
-  height: 45px;
-  width: 45px;
+  height: 40px;
+  width: 40px;
 }
 
 .info-div {

@@ -49,6 +49,8 @@ export class King extends Piece {
 
     return possibleMoves;
   }
+
+  isChecked() {}
 }
 
 export class Queen extends Piece {
