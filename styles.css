@@ -40,7 +40,6 @@ h1 {
   background-color: antiquewhite;
   display: flex;
   flex-wrap: wrap;
-  border-radius: 3px;
   overflow: hidden;
   box-shadow: 0px 0px 50px rgb(100, 100, 100);
 }
@@ -52,6 +51,7 @@ h1 {
   justify-content: center;
   align-items: center;
   position: relative;
+  border: 0.5px solid black;
 }
 
 .beige {
@@ -66,6 +66,10 @@ h1 {
   width: 50px;
 }
 
+.legal {
+  background-color: burlywood;
+}
+
 .piece {
   height: 40px;
   width: 40px;
@@ -73,10 +77,16 @@ h1 {
 
 .info-div {
   height: 50px;
+  text-align: center;
 }
 
 h5 {
   margin-top: 20px;
+}
+
+h6 {
+  margin-top: 15px;
+  color: red;
 }
 
 p {
@@ -88,12 +98,11 @@ p {
 
 #cemetery {
   height: 400px;
-  width: 200px;
-  padding: 5px;
+  width: 220px;
+  padding: 10px;
   margin-left: 50px;
-  background-color: beige;
+  background-color: rgb(239, 225, 205);
+  outline: 0.5px solid black;
   box-shadow: 0px 0px 50px rgb(175, 175, 175);
-  border-radius: 3px;
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-block;
 }

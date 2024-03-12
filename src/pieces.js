@@ -4,10 +4,11 @@ class Piece {
   constructor(name, color) {
     this.name = name;
     this.color = color;
+    this.board = document.getElementById("board");
   }
 
   renderPiece(pieceName) {
-    // Create the piece
+    // Create piece
     const piece = document.createElement("img");
     piece.classList.add("piece", pieceName, this.color);
     piece.src = `./img/${pieceName}.png`;
@@ -17,6 +18,17 @@ class Piece {
   isWithinBoard(x, y) {
     // Check boundaries of the board
     return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+  }
+
+  hasObstacle(targetX, targetY) {
+    const piece = this.board.querySelector(
+      `.cell[data-x="${targetX}"][data-y="${targetY}"] img`
+    );
+    return piece;
+  }
+
+  hasSameColor(targetPieceColor) {
+    return this.color !== targetPieceColor;
   }
 }
 
@@ -42,15 +54,17 @@ export class King extends Piece {
     for (const direction of directions) {
       let targetX = currentX + direction.x;
       let targetY = currentY + direction.y;
-      possibleMoves.push({ x: targetX, y: targetY });
-      targetX += direction.x;
-      targetY += direction.y;
-    }
 
+      if (this.isWithinBoard(targetX, targetY)) {
+        const hasObstacle = this.hasObstacle(targetX, targetY);
+        const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+        if (!hasObstacle || this.hasSameColor(targetPieceColor)) {
+          possibleMoves.push({ x: targetX, y: targetY });
+        }
+      }
+    }
     return possibleMoves;
   }
-
-  isChecked() {}
 }
 
 export class Queen extends Piece {
@@ -77,7 +91,17 @@ export class Queen extends Piece {
       let targetY = currentY + direction.y;
 
       while (super.isWithinBoard(targetX, targetY)) {
-        possibleMoves.push({ x: targetX, y: targetY });
+        const hasObstacle = this.hasObstacle(targetX, targetY);
+        const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+        if (hasObstacle) {
+          if (this.hasSameColor(targetPieceColor)) {
+            possibleMoves.push({ x: targetX, y: targetY });
+          }
+          break;
+        } else {
+          possibleMoves.push({ x: targetX, y: targetY });
+        }
+
         targetX += direction.x;
         targetY += direction.y;
       }
@@ -105,8 +129,18 @@ export class Rook extends Piece {
       let targetX = currentX + direction.x;
       let targetY = currentY + direction.y;
 
-      while (super.isWithinBoard(targetX, targetY)) {
-        possibleMoves.push({ x: targetX, y: targetY });
+      while (this.isWithinBoard(targetX, targetY)) {
+        const hasObstacle = this.hasObstacle(targetX, targetY);
+        const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+        if (hasObstacle) {
+          if (this.hasSameColor(targetPieceColor)) {
+            possibleMoves.push({ x: targetX, y: targetY });
+          }
+          break;
+        } else {
+          possibleMoves.push({ x: targetX, y: targetY });
+        }
+
         targetX += direction.x;
         targetY += direction.y;
       }
@@ -134,8 +168,18 @@ export class Bishop extends Piece {
       let targetX = currentX + direction.x;
       let targetY = currentY + direction.y;
 
-      while (super.isWithinBoard(targetX, targetY)) {
-        possibleMoves.push({ x: targetX, y: targetY });
+      while (this.isWithinBoard(targetX, targetY)) {
+        const hasObstacle = this.hasObstacle(targetX, targetY);
+        const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+        if (hasObstacle) {
+          if (this.hasSameColor(targetPieceColor)) {
+            possibleMoves.push({ x: targetX, y: targetY });
+          }
+          break;
+        } else {
+          possibleMoves.push({ x: targetX, y: targetY });
+        }
+
         targetX += direction.x;
         targetY += direction.y;
       }
@@ -159,13 +203,20 @@ export class Knight extends Piece {
       { x: currentX + 1, y: currentY - 2 }, // Down-Left
       { x: currentX - 2, y: currentY + 1 }, // Up-Up-Right
       { x: currentX - 1, y: currentY + 2 }, // Up-Right
-      { x: currentX + 2, y: currentY + 1 }, // Down-Down-Left
-      { x: currentX + 1, y: currentY + 2 }, // Down-Left
+      { x: currentX + 2, y: currentY + 1 }, // Down-Down-Right
+      { x: currentX + 1, y: currentY + 2 }, // Down-Right
     ];
 
     for (const direction of directions) {
-      if (super.isWithinBoard(direction.x, direction.y)) {
-        possibleMoves.push({ x: direction.x, y: direction.y });
+      const targetX = direction.x;
+      const targetY = direction.y;
+
+      if (this.isWithinBoard(targetX, targetY)) {
+        const hasObstacle = this.hasObstacle(targetX, targetY);
+        const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+        if (!hasObstacle || this.hasSameColor(targetPieceColor)) {
+          possibleMoves.push({ x: targetX, y: targetY });
+        }
       }
     }
     return possibleMoves;
@@ -180,17 +231,63 @@ export class Pawn extends Piece {
   checkValidMove(pieceName, pieceColor, currentX, currentY) {
     let possibleMoves = [];
 
-    let deltaX;
+    let targetX;
     if (pieceColor === "white") {
-      deltaX = currentX - 1;
+      targetX = currentX - 1;
     } else {
-      deltaX = currentX + 1;
+      targetX = currentX + 1;
     }
+    let targetY = currentY;
 
-    let deltaY = currentY;
+    if (super.isWithinBoard(targetX, targetY)) {
+      if (!this.hasObstacle(targetX, targetY)) {
+        possibleMoves.push({ x: targetX, y: targetY });
 
-    possibleMoves.push({ x: deltaX, y: deltaY });
+        // First move
+        if (
+          (pieceColor === "white" && currentX === 6) ||
+          (pieceColor === "black" && currentX === 1)
+        ) {
+          let doubletargetX;
+          if (pieceColor === "white") {
+            doubletargetX = currentX - 2;
+          } else {
+            doubletargetX = currentX + 2;
+          }
 
+          if (
+            super.isWithinBoard(doubletargetX, targetY) &&
+            !this.hasObstacle(doubletargetX, targetY)
+          ) {
+            possibleMoves.push({ x: doubletargetX, y: targetY });
+          }
+        }
+      }
+
+      // Assign diagonals moves to eat opponent pieces
+      let rightDiagonal = currentY + 1;
+      let leftDiagonal = currentY - 1;
+
+      // Left diagonal
+      if (super.isWithinBoard(targetX, leftDiagonal)) {
+        if (this.hasObstacle(targetX, leftDiagonal)) {
+          const hasObstacle = this.hasObstacle(targetX, leftDiagonal);
+          const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+          if (this.hasSameColor(targetPieceColor))
+            possibleMoves.push({ x: targetX, y: leftDiagonal });
+        }
+      }
+
+      // Right diagonal
+      if (super.isWithinBoard(targetX, rightDiagonal)) {
+        if (this.hasObstacle(targetX, rightDiagonal)) {
+          const hasObstacle = this.hasObstacle(targetX, leftDiagonal);
+          const targetPieceColor = hasObstacle && hasObstacle.classList[2];
+          if (this.hasSameColor(targetPieceColor))
+            possibleMoves.push({ x: targetX, y: rightDiagonal });
+        }
+      }
+    }
     return possibleMoves;
   }
 }

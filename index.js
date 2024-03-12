@@ -1,10 +1,9 @@
 import { King, Queen, Rook, Bishop, Knight, Pawn } from "./src/pieces.js";
 
 const board = document.querySelector("#board");
-const information = document.querySelector("#information");
+const informationOne = document.querySelector("#information-one");
+const informationTwo = document.querySelector("#information-two");
 const cemetery = document.querySelector("#cemetery");
-const cells = document.querySelectorAll(".cell");
-const pieces = document.querySelectorAll(".piece");
 
 let turn = true;
 
@@ -41,14 +40,14 @@ function renderBoard() {
     "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
     "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
-    "", "", "", "whiteQueen", "", "", "", "",
-    "", "", "", "", "", "whiteRook", "", "",
+    "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
     "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
     "whiteRook", "whiteBishop", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
   ];
 
-  // Iterate over the startPosition array to create the board
+  // Iterate over startPosition array to create board
   for (let i = 0; i < startingPosition.length; i++) {
     const cell = document.createElement("div");
     cell.classList.add("cell");
@@ -57,18 +56,18 @@ function renderBoard() {
     const row = Math.floor(i / 8);
     const col = i % 8;
 
-    // Assign coordinates to a cell
+    // Assign coordinates to cells
     cell.dataset.x = row;
     cell.dataset.y = col;
 
-    // Assign name to a cell
+    // Assign name to cells
     cell.dataset.row = String.fromCharCode(97 + col);
     cell.dataset.col = 8 - row;
     const p = document.createElement("p");
     p.innerText = `${cell.dataset.row}${cell.dataset.col}`;
     cell.append(p);
 
-    // Add classes for checkboard's colors
+    // Add classes for checkboard colors
     if ((row + col) % 2 === 0) {
       cell.classList.add("beige");
     } else {
@@ -82,7 +81,7 @@ function renderBoard() {
       cell.append(piece);
     }
 
-    // Call the movePiece() function when clicking on a cell
+    // Call movePiece() function when clicking on a cell
     cell.addEventListener("click", () => {
       movePieces(cell);
     });
@@ -127,21 +126,24 @@ function movePieces(cell) {
         // Assign the temporary variables
         selectedPiece = piece;
         selectedCell = cell;
-        information.innerText = `${pieceName} selected: ${cellXName}${cellYName}`;
+        informationOne.innerText = `${pieceName} selected: ${cellXName}${cellYName}`;
         console.log(`${pieceName} selected: { x: ${cellX}, y: ${cellY} }`);
+        informationTwo.innerText = "";
 
         // Assign legalMove variable to validMove
         legalMove = validMove;
         console.log(legalMove);
         for (const move of legalMove) {
-          console.log(move);
+          document
+            .querySelector(`.cell[data-x="${move.x}"][data-y="${move.y}"]`)
+            .classList.add("legal");
         }
       } else {
-        information.innerText = "Not your turn";
+        informationTwo.innerText = "Not your turn";
         console.log("Not your turn");
       }
     } else {
-      information.innerText = "Select a piece";
+      informationTwo.innerText = "Select a piece";
       console.log("Select a piece");
     }
     return;
@@ -151,12 +153,16 @@ function movePieces(cell) {
   if (cell === selectedCell) {
     selectedPiece = null;
     selectedCell = null;
-    information.innerText = "Piece deselected";
+    informationTwo.innerText = "Piece deselected";
     console.log("Piece deselected");
+    document
+      .querySelectorAll(".legal")
+      .forEach((cell) => cell.classList.remove("legal"));
+
     return;
   }
 
-  // Add selected piece to target cell
+  // Create variable for selected cell position
   const selectedCellX = cell.dataset.x;
   const selectedCellY = cell.dataset.y;
   const selectedCellPosition = { x: +selectedCellX, y: +selectedCellY };
@@ -167,42 +173,36 @@ function movePieces(cell) {
   );
 
   if (isLegalMove) {
-    // Check if the target cell contains a piece
+    // Move dead piece to cemetery
     const targetPiece = cell.querySelector(".piece");
-    if (!targetPiece || !hasSameColor(selectedPiece, targetPiece)) {
-      // Move the piece to the new cell
-      cell.appendChild(selectedPiece);
-
-      // Check if there is a piece in the target cell to move it to cemetery
-      if (targetPiece) {
-        cell.removeChild(targetPiece);
-        cemetery.appendChild(targetPiece);
-      }
-
-      // Display the move on the screen
-      const pieceName = selectedPiece.classList[1];
-      information.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
-      console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
-
-      // Change piece coordinates based on target cell
-      selectedPiece.dataset.x = cellX;
-      selectedPiece.dataset.y = cellY;
-
-      // Put selected cell and selected piece to null again for next turn
-      selectedPiece = null;
-      selectedCell = null;
-
-      // Change turn
-      turn = !turn;
-    } else {
-      selectedPiece = null;
-      selectedCell = null;
-      information.innerText = "Not a valid move";
-      console.log("Not a valid move");
-      return;
+    if (targetPiece) {
+      cell.removeChild(targetPiece);
+      cemetery.appendChild(targetPiece);
     }
+    // Move piece to new cell
+    cell.appendChild(selectedPiece);
+    document
+      .querySelectorAll(".legal")
+      .forEach((cell) => cell.classList.remove("legal"));
+
+    // Display move on the screen
+    const pieceName = selectedPiece.classList[1];
+    informationOne.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
+    console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
+    informationTwo.innerText = "";
+
+    // Change piece coordinates based on target cell
+    selectedPiece.dataset.x = cellX;
+    selectedPiece.dataset.y = cellY;
+
+    // Put selected cell and selected piece to null again for next turn
+    selectedPiece = null;
+    selectedCell = null;
+
+    // Change turn
+    turn = !turn;
   } else {
-    information.innerText = "Not a valid move";
+    informationTwo.innerText = "Not a valid move";
     console.log("Not a valid move");
   }
 }
@@ -218,25 +218,6 @@ function checkTurn() {
 
 function samePosition(legalMove, selectedCellPosition) {
   return JSON.stringify(legalMove) === JSON.stringify(selectedCellPosition);
-}
-
-function hasSameColor(piece, targetPiece) {
-  let pieceColor = "";
-  let targetPieceColor = "";
-
-  if (piece.classList.contains("white")) {
-    pieceColor = "white";
-  } else {
-    pieceColor = "black";
-  }
-
-  if (targetPiece.classList.contains("white")) {
-    targetPieceColor = "white";
-  } else {
-    targetPieceColor = "black";
-  }
-
-  return pieceColor === targetPieceColor;
 }
 
 startGame();
