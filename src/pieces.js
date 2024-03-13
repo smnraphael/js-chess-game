@@ -65,6 +65,20 @@ export class King extends Piece {
     }
     return possibleMoves;
   }
+
+  isInCheck(opponentPieces) {
+    const kingPosition = { x: this.currentX, y: this.currentY };
+
+    for (const opponentPiece of opponentPieces) {
+      const possibleMoves = opponentPiece.checkValidMove();
+      for (const move of possibleMoves) {
+        if (move.x === kingPosition.x && move.y === kingPosition.y) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
 
 export class Queen extends Piece {
@@ -239,7 +253,7 @@ export class Pawn extends Piece {
     }
     let targetY = currentY;
 
-    if (super.isWithinBoard(targetX, targetY)) {
+    if (this.isWithinBoard(targetX, targetY)) {
       if (!this.hasObstacle(targetX, targetY)) {
         possibleMoves.push({ x: targetX, y: targetY });
 
@@ -256,7 +270,7 @@ export class Pawn extends Piece {
           }
 
           if (
-            super.isWithinBoard(doubletargetX, targetY) &&
+            this.isWithinBoard(doubletargetX, targetY) &&
             !this.hasObstacle(doubletargetX, targetY)
           ) {
             possibleMoves.push({ x: doubletargetX, y: targetY });
@@ -269,7 +283,7 @@ export class Pawn extends Piece {
       let leftDiagonal = currentY - 1;
 
       // Left diagonal
-      if (super.isWithinBoard(targetX, leftDiagonal)) {
+      if (this.isWithinBoard(targetX, leftDiagonal)) {
         if (this.hasObstacle(targetX, leftDiagonal)) {
           const hasObstacle = this.hasObstacle(targetX, leftDiagonal);
           const targetPieceColor = hasObstacle && hasObstacle.classList[2];
@@ -279,9 +293,9 @@ export class Pawn extends Piece {
       }
 
       // Right diagonal
-      if (super.isWithinBoard(targetX, rightDiagonal)) {
+      if (this.isWithinBoard(targetX, rightDiagonal)) {
         if (this.hasObstacle(targetX, rightDiagonal)) {
-          const hasObstacle = this.hasObstacle(targetX, leftDiagonal);
+          const hasObstacle = this.hasObstacle(targetX, rightDiagonal);
           const targetPieceColor = hasObstacle && hasObstacle.classList[2];
           if (this.hasSameColor(targetPieceColor))
             possibleMoves.push({ x: targetX, y: rightDiagonal });

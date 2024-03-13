@@ -134,6 +134,7 @@ function movePieces(cell) {
         legalMove = validMove;
         console.log(legalMove);
         for (const move of legalMove) {
+          // Add styling for valid moves
           document
             .querySelector(`.cell[data-x="${move.x}"][data-y="${move.y}"]`)
             .classList.add("legal");
@@ -153,8 +154,10 @@ function movePieces(cell) {
   if (cell === selectedCell) {
     selectedPiece = null;
     selectedCell = null;
-    informationTwo.innerText = "Piece deselected";
+    informationOne.innerText = "Piece deselected";
     console.log("Piece deselected");
+
+    // Remove styling for valid moves
     document
       .querySelectorAll(".legal")
       .forEach((cell) => cell.classList.remove("legal"));
@@ -173,34 +176,125 @@ function movePieces(cell) {
   );
 
   if (isLegalMove) {
-    // Move dead piece to cemetery
     const targetPiece = cell.querySelector(".piece");
-    if (targetPiece) {
-      cell.removeChild(targetPiece);
-      cemetery.appendChild(targetPiece);
+    const checkPiece = selectedPiece.classList[1];
+
+    // Pawn moves
+    if (checkPiece.includes("Pawn")) {
+      // Add dead piece to cemetery
+      if (targetPiece) {
+        cell.removeChild(targetPiece);
+        cemetery.appendChild(targetPiece);
+      }
+
+      // Move pawn to target cell
+      cell.appendChild(selectedPiece);
+      document
+        .querySelectorAll(".legal")
+        .forEach((cell) => cell.classList.remove("legal"));
+
+      // Display move
+      const pieceName = selectedPiece.classList[1];
+      informationOne.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
+      informationTwo.innerText = "";
+
+      // Change piece coordinates based on target cell
+      selectedPiece.dataset.x = cellX;
+      selectedPiece.dataset.y = cellY;
+
+      // Put selectedCell and selectedPiece to null again for next turn
+      selectedPiece = null;
+      selectedCell = null;
+
+      // Change turn
+      turn = !turn;
     }
-    // Move piece to new cell
-    cell.appendChild(selectedPiece);
-    document
-      .querySelectorAll(".legal")
-      .forEach((cell) => cell.classList.remove("legal"));
 
-    // Display move on the screen
-    const pieceName = selectedPiece.classList[1];
-    informationOne.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
-    console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
-    informationTwo.innerText = "";
+    // Promote whitePawn to whiteQueen
+    else if (checkPiece === "whitePawn" && cellX === 0) {
+      const newPiece = new Queen("queen", "white");
+      cell.appendChild(newPiece.renderPiece("whiteQueen"));
+      remove(selectedPiece);
+      // Display promotion
+      informationOne.innerText = "whitePawn promoted to whiteQueen";
 
-    // Change piece coordinates based on target cell
-    selectedPiece.dataset.x = cellX;
-    selectedPiece.dataset.y = cellY;
+      // Add dead piece to cemetery
+      if (targetPiece) {
+        cell.removeChild(targetPiece);
+        cemetery.appendChild(targetPiece);
+      }
 
-    // Put selected cell and selected piece to null again for next turn
-    selectedPiece = null;
-    selectedCell = null;
+      // Remove styling for valid moves
+      document
+        .querySelectorAll(".legal")
+        .forEach((cell) => cell.classList.remove("legal"));
 
-    // Change turn
-    turn = !turn;
+      // Put selectedCell and selectedPiece to null again for next turn
+      selectedPiece = null;
+      selectedCell = null;
+
+      // Change turn
+      turn = !turn;
+    }
+
+    // Promote blackPawn to blackQueen
+    else if (checkPiece === "blackPawn" && cellX === 7) {
+      const newPiece = new Queen("queen", "black");
+      cell.appendChild(newPiece.renderPiece("blackQueen"));
+      remove(selectedPiece);
+      // Display promotion
+      informationOne.innerText = "blackPawn promoted to blackQueen";
+
+      // Add dead piece to cemetery
+      if (targetPiece) {
+        cell.removeChild(targetPiece);
+        cemetery.appendChild(targetPiece);
+      }
+
+      // Remove styling for valid moves
+      document
+        .querySelectorAll(".legal")
+        .forEach((cell) => cell.classList.remove("legal"));
+
+      // Put selectedCell and selectedPiece to null again for next turn
+      selectedPiece = null;
+      selectedCell = null;
+
+      // Change turn
+      turn = !turn;
+    }
+
+    // Other moves
+    else {
+      // Add dead piece to cemetery
+      if (targetPiece) {
+        cell.removeChild(targetPiece);
+        cemetery.appendChild(targetPiece);
+      }
+
+      // Remove styling for valid moves
+      cell.appendChild(selectedPiece);
+      document
+        .querySelectorAll(".legal")
+        .forEach((cell) => cell.classList.remove("legal"));
+
+      // Display move
+      const pieceName = selectedPiece.classList[1];
+      informationOne.innerText = `${pieceName} moved: ${cellXName}${cellYName}`;
+      console.log(`${pieceName} moved: { x: ${cellX}, y: ${cellY} }`);
+      informationTwo.innerText = "";
+
+      // Change piece coordinates based on target cell
+      selectedPiece.dataset.x = cellX;
+      selectedPiece.dataset.y = cellY;
+
+      // Put selectedCell and selectedPiece to null again for next turn
+      selectedPiece = null;
+      selectedCell = null;
+
+      // Change turn
+      turn = !turn;
+    }
   } else {
     informationTwo.innerText = "Not a valid move";
     console.log("Not a valid move");
@@ -218,6 +312,11 @@ function checkTurn() {
 
 function samePosition(legalMove, selectedCellPosition) {
   return JSON.stringify(legalMove) === JSON.stringify(selectedCellPosition);
+}
+
+function remove(element) {
+  const elementToRemove = element;
+  elementToRemove.remove();
 }
 
 startGame();

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,7 +7,7 @@
 }
 
 html {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-family: "Montserrat", sans-serif;
   background-color: antiquewhite;
 }
 
@@ -17,7 +19,7 @@ html {
 }
 
 h1 {
-  margin: 50px;
+  margin: 40px;
 }
 
 .chess-container {
@@ -31,7 +33,7 @@ h1 {
 }
 
 .margin {
-  height: 150px;
+  height: 120px;
 }
 
 #board {
@@ -81,11 +83,11 @@ h1 {
 }
 
 h5 {
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 h6 {
-  margin-top: 15px;
+  margin-top: 20px;
   color: red;
 }
 
