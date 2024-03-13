@@ -37,14 +37,14 @@ function startGame() {
 function renderBoard() {
   // prettier-ignore
   const startingPosition = [
-    "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
-    "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
+    "blackRook", "", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
+    "blackPawn", "whitePawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
+    "", "whiteRook", "", "whitePawn", "", "", "", "",
     "", "", "", "", "", "", "", "",
-    "", "", "", "", "", "", "", "",
-    "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
-    "whiteRook", "whiteBishop", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
+    "whitePawn", "blackPawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
+    "whiteRook", "", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
   ];
 
   // Iterate over startPosition array to create board
@@ -180,13 +180,11 @@ function movePieces(cell) {
     const checkPiece = selectedPiece.classList[1];
 
     // Pawn moves
-    if (checkPiece.includes("Pawn")) {
-      // Add dead piece to cemetery
-      if (targetPiece) {
-        cell.removeChild(targetPiece);
-        cemetery.appendChild(targetPiece);
-      }
-
+    if (
+      checkPiece.includes("Pawn") &&
+      Math.abs(cellX - selectedCellX) === 1 &&
+      !targetPiece
+    ) {
       // Move pawn to target cell
       cell.appendChild(selectedPiece);
       document
