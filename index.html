@@ -4,12 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
     <title>Chess Game</title>
   </head>
   <body>
     <div class="container">
       <div class="chess-container">
         <div class="left">
+          <div class="margin"></div>
+          <div class="timers">
+            <div>
+              <h4>Black timer</h4>
+              <h2 id="black-timer">30:00</h2>
+              <button id="black-resign">Resign</button>
+            </div>
+            <div>
+              <h4>White timer</h4>
+              <h2 id="white-timer">30:00</h2>
+              <button id="white-resign">Resign</button>
+            </div>
+          </div>
+        </div>
+        <div class="middle">
           <div class="margin">
             <h1>Chess Game</h1>
           </div>
@@ -22,7 +38,16 @@
 
         <div class="right">
           <div class="margin"></div>
-          <div id="cemetery"></div>
+          <div class="cemetery">
+            <div>
+              <h4 class="black-cemetery">Black</h4>
+              <div id="black-cemetery"></div>
+            </div>
+            <div>
+              <h4 class="white-cemetery">White</h4>
+              <div id="white-cemetery"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ class Piece {
     // Create piece
     const piece = document.createElement("img");
     piece.classList.add("piece", pieceName, this.color);
-    piece.src = `./img/${pieceName}.png`;
+    piece.src = `./images/${pieceName}.png`;
     return piece;
   }
 

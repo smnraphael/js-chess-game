@@ -3,9 +3,25 @@ import { King, Queen, Rook, Bishop, Knight, Pawn } from "./src/pieces.js";
 const board = document.querySelector("#board");
 const informationOne = document.querySelector("#information-one");
 const informationTwo = document.querySelector("#information-two");
-const cemetery = document.querySelector("#cemetery");
+const blackCemetery = document.querySelector("#black-cemetery");
+const whiteCemetery = document.querySelector("#white-cemetery");
+const blackTimer = document.querySelector("#black-timer");
+const whiteTimer = document.querySelector("#white-timer");
+const blackResign = document.querySelector("#black-resign");
+const whiteResign = document.querySelector("#white-resign");
+
+const movePiece = new Audio("./sounds/move.mp3");
+const capturePiece = new Audio("./sounds/capture.mp3");
+const notify = new Audio("./sounds/notify.mp3");
+const end = new Audio("./sounds/end.mp3");
 
 let turn = true;
+let gameOver = false;
+
+let whiteCounter = 1800;
+let blackCounter = 1800;
+let whiteTimerID;
+let blackTimerID;
 
 let selectedPiece = null;
 let selectedCell = null;
@@ -40,8 +56,8 @@ function renderBoard() {
     "blackRook", "", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
     "blackPawn", "whitePawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
-    "", "", "", "", "", "", "", "",
-    "", "whiteRook", "", "whitePawn", "", "", "", "",
+    "", "", "", "", "", "blackRook", "", "",
+    "", "whiteRook", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
     "whitePawn", "blackPawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
     "whiteRook", "", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
@@ -89,6 +105,11 @@ function renderBoard() {
 }
 
 function movePieces(cell) {
+  // Not allow moves if Game Over
+  if (gameOver) {
+    return;
+  }
+
   // Get cell coordinates
   const cellX = +cell.dataset.x;
   const cellY = +cell.dataset.y;
@@ -142,10 +163,12 @@ function movePieces(cell) {
       } else {
         informationTwo.innerText = "Not your turn";
         console.log("Not your turn");
+        notify.play();
       }
     } else {
       informationTwo.innerText = "Select a piece";
       console.log("Select a piece");
+      notify.play();
     }
     return;
   }
@@ -204,6 +227,8 @@ function movePieces(cell) {
       selectedPiece = null;
       selectedCell = null;
 
+      movePiece.play();
+
       // Change turn
       turn = !turn;
     }
@@ -219,8 +244,17 @@ function movePieces(cell) {
       // Add dead piece to cemetery
       if (targetPiece) {
         cell.removeChild(targetPiece);
-        cemetery.appendChild(targetPiece);
+        if (targetPiece.classList.contains("white")) {
+          whiteCemetery.appendChild(targetPiece);
+        } else {
+          blackCemetery.appendChild(targetPiece);
+        }
+
+        capturePiece.play();
       }
+
+      movePiece.play();
+      notify.play();
 
       // Remove styling for valid moves
       document
@@ -246,8 +280,17 @@ function movePieces(cell) {
       // Add dead piece to cemetery
       if (targetPiece) {
         cell.removeChild(targetPiece);
-        cemetery.appendChild(targetPiece);
+        if (targetPiece.classList.contains("white")) {
+          whiteCemetery.appendChild(targetPiece);
+        } else {
+          blackCemetery.appendChild(targetPiece);
+        }
+
+        capturePiece.play();
       }
+
+      movePiece.play();
+      notify.play();
 
       // Remove styling for valid moves
       document
@@ -267,8 +310,16 @@ function movePieces(cell) {
       // Add dead piece to cemetery
       if (targetPiece) {
         cell.removeChild(targetPiece);
-        cemetery.appendChild(targetPiece);
+        if (targetPiece.classList.contains("white")) {
+          whiteCemetery.appendChild(targetPiece);
+        } else {
+          blackCemetery.appendChild(targetPiece);
+        }
+
+        capturePiece.play();
       }
+
+      movePiece.play();
 
       // Remove styling for valid moves
       cell.appendChild(selectedPiece);
@@ -317,4 +368,83 @@ function remove(element) {
   elementToRemove.remove();
 }
 
+function startTimers() {
+  whiteTimerID = setInterval(() => {
+    if (turn && !gameOver) {
+      whiteCounter--;
+      updateTimerDisplay(whiteCounter, whiteTimer);
+      if (whiteCounter === 0) {
+        clearInterval(whiteTimerID);
+        informationOne.innerText = "Black wins!";
+        informationTwo.innerText = "White player ran out of time";
+        console.log("Black wins!");
+        console.log("White player ran out of time");
+        gameOver = true;
+        stopTimers();
+        end.play();
+      }
+    }
+  }, 1000);
+
+  blackTimerID = setInterval(() => {
+    if (!turn && !gameOver) {
+      blackCounter--;
+      updateTimerDisplay(blackCounter, blackTimer);
+      if (blackCounter === 0) {
+        clearInterval(blackTimerID);
+        informationOne.innerText = "White wins!";
+        informationTwo.innerText = "Black player ran out of time";
+        console.log("White wins!");
+        console.log("Black player ran out of time");
+        gameOver = true;
+        stopTimers();
+        end.play();
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(time, displayElement) {
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  displayElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
+}
+
+function stopTimers() {
+  clearInterval(whiteTimerID);
+  clearInterval(blackTimerID);
+  turn = null;
+}
+
+blackResign.addEventListener("click", (e) => {
+  informationOne.innerText = "White wins!";
+  informationTwo.innerText = "Black resigned";
+  console.log("Black resigned");
+  gameOver = true;
+  stopTimers();
+  disablePlayerActions();
+});
+
+whiteResign.addEventListener("click", (e) => {
+  informationOne.innerText = "Black wins!";
+  informationTwo.innerText = "White resigned";
+  console.log("White resigned");
+  gameOver = true;
+  stopTimers();
+  disablePlayerActions();
+});
+
+function disablePlayerActions() {
+  // If the game is over, remove event listeners from all cells
+  if (gameOver) {
+    document.querySelectorAll(".cell").forEach((cell) => {
+      cell.removeEventListener("click", movePieces);
+    });
+    end.play();
+  }
+}
+
 startGame();
+startTimers();
