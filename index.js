@@ -12,6 +12,8 @@ const whiteResign = document.querySelector("#white-resign");
 const startButton = document.querySelector("#start-button");
 const resetButton = document.querySelector("#reset-button");
 
+const backgroundMusic = new Audio("./sounds/background-music.mp3");
+backgroundMusic.volume = 0.2;
 const movePiece = new Audio("./sounds/move.mp3");
 const capturePiece = new Audio("./sounds/capture.mp3");
 const notify = new Audio("./sounds/notify.mp3");
@@ -447,6 +449,8 @@ function disablePlayerActions() {
       cell.removeEventListener("click", movePieces);
     });
     end.play();
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
   }
 }
 
@@ -458,6 +462,7 @@ startButton.addEventListener("click", () => {
   startTimers();
   startButton.setAttribute("disabled", "disabled");
   startButton.style.cursor = "default";
+  backgroundMusic.play();
 });
 
 // Reset the game
@@ -495,4 +500,8 @@ resetButton.addEventListener("click", () => {
   // Clear information messages
   informationOne.innerText = "";
   informationTwo.innerText = "";
+
+  // Stop background music
+  backgroundMusic.pause();
+  backgroundMusic.currentTime = 0;
 });
