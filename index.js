@@ -9,12 +9,15 @@ const blackTimer = document.querySelector("#black-timer");
 const whiteTimer = document.querySelector("#white-timer");
 const blackResign = document.querySelector("#black-resign");
 const whiteResign = document.querySelector("#white-resign");
+const startButton = document.querySelector("#start-button");
+const resetButton = document.querySelector("#reset-button");
 
 const movePiece = new Audio("./sounds/move.mp3");
 const capturePiece = new Audio("./sounds/capture.mp3");
 const notify = new Audio("./sounds/notify.mp3");
 const end = new Audio("./sounds/end.mp3");
 
+let gameRunning = false;
 let turn = true;
 let gameOver = false;
 
@@ -46,21 +49,17 @@ const piecesClass = {
   whiteKing, whiteQueen, whiteRook, whiteBishop, whiteKnight, whitePawn,
 };
 
-function startGame() {
-  renderBoard();
-}
-
 function renderBoard() {
   // prettier-ignore
   const startingPosition = [
-    "blackRook", "", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
-    "blackPawn", "whitePawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
+    "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
+    "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
-    "", "", "", "", "", "blackRook", "", "",
-    "", "whiteRook", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
-    "whitePawn", "blackPawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
-    "whiteRook", "", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
+    "", "", "", "", "", "", "", "",
+    "", "", "", "", "", "", "", "",
+    "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn",
+    "whiteRook", "whiteBishop", "whiteKnight", "whiteQueen", "whiteKing", "whiteKnight", "whiteBishop", "whiteRook",
   ];
 
   // Iterate over startPosition array to create board
@@ -105,6 +104,11 @@ function renderBoard() {
 }
 
 function movePieces(cell) {
+  // Not allow moves if game didn't start
+  if (!gameRunning) {
+    return;
+  }
+
   // Not allow moves if Game Over
   if (gameOver) {
     return;
@@ -446,5 +450,45 @@ function disablePlayerActions() {
   }
 }
 
-startGame();
-startTimers();
+renderBoard();
+
+// Start the game
+startButton.addEventListener("click", () => {
+  gameRunning = true;
+  startTimers();
+  startButton.setAttribute("disabled", "disabled");
+  startButton.style.cursor = "default";
+});
+
+// Reset the game
+resetButton.addEventListener("click", () => {
+  // Clear the board
+  board.innerHTML = "";
+
+  // Reset timers
+  clearInterval(whiteTimerID);
+  clearInterval(blackTimerID);
+  whiteCounter = 1800;
+  blackCounter = 1800;
+  updateTimerDisplay(whiteCounter, whiteTimer);
+  updateTimerDisplay(blackCounter, blackTimer);
+
+  // Reset game variables
+  gameRunning = false;
+  turn = true;
+  gameOver = false;
+  selectedPiece = null;
+  selectedCell = null;
+  legalMove = null;
+
+  // Render the board again
+  renderBoard();
+
+  // Enable start button
+  startButton.removeAttribute("disabled");
+  startButton.style.cursor = "pointer";
+
+  // Clear information messages
+  informationOne.innerText = "";
+  informationTwo.innerText = "";
+});
