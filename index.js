@@ -484,6 +484,10 @@ resetButton.addEventListener("click", () => {
   // Render the board again
   renderBoard();
 
+  // Clear cemeteries
+  blackCemetery.innerText = "";
+  whiteCemetery.innerText = "";
+
   // Enable start button
   startButton.removeAttribute("disabled");
   startButton.style.cursor = "pointer";
