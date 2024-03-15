@@ -1,5 +1,9 @@
 # Javascript Chess Game
 
+## Link
+
+https://smnraphael.github.io/js-chess-game/
+
 ## Why I chose this game?
 
 Before I start learning about programming one year ago, I was looking for a youtubeur's videos and he decided to learn programming by doing a Chess Game so it inspired me to do the same thing. And also because I like playing Chess.
@@ -21,7 +25,3 @@ Before I start learning about programming one year ago, I was looking for a yout
 ## What's next?
 
 I want to re-start the project from scratch but using a matrix, and adding the position of the pieces in their respective classes. The current structure of my code made it difficult to use and to create a function to check if the King is in check.
-
-## Link
-
-https://smnraphael.github.io/js-chess-game/
