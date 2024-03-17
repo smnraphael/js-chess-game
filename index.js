@@ -54,8 +54,8 @@ const piecesClass = {
 function renderBoard() {
   // prettier-ignore
   const startingPosition = [
-    "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
-    "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
+    "blackRook", "", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
+    "blackPawn", "whitePawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
@@ -241,74 +241,12 @@ function movePieces(cell) {
 
     // Promote whitePawn to whiteQueen
     else if (checkPiece === "whitePawn" && cellX === 0) {
-      const newPiece = new Queen("queen", "white");
-      cell.appendChild(newPiece.renderPiece("whiteQueen"));
-      remove(selectedPiece);
-      // Display promotion
-      informationOne.innerText = "whitePawn promoted to whiteQueen";
-
-      // Add dead piece to cemetery
-      if (targetPiece) {
-        cell.removeChild(targetPiece);
-        if (targetPiece.classList.contains("white")) {
-          whiteCemetery.appendChild(targetPiece);
-        } else {
-          blackCemetery.appendChild(targetPiece);
-        }
-
-        capturePiece.play();
-      }
-
-      movePiece.play();
-      notify.play();
-
-      // Remove styling for valid moves
-      document
-        .querySelectorAll(".legal")
-        .forEach((cell) => cell.classList.remove("legal"));
-
-      // Put selectedCell and selectedPiece to null again for next turn
-      selectedPiece = null;
-      selectedCell = null;
-
-      // Change turn
-      turn = !turn;
+      promotePawn("white", "whiteQueen", cell, targetPiece);
     }
 
     // Promote blackPawn to blackQueen
     else if (checkPiece === "blackPawn" && cellX === 7) {
-      const newPiece = new Queen("queen", "black");
-      cell.appendChild(newPiece.renderPiece("blackQueen"));
-      remove(selectedPiece);
-      // Display promotion
-      informationOne.innerText = "blackPawn promoted to blackQueen";
-
-      // Add dead piece to cemetery
-      if (targetPiece) {
-        cell.removeChild(targetPiece);
-        if (targetPiece.classList.contains("white")) {
-          whiteCemetery.appendChild(targetPiece);
-        } else {
-          blackCemetery.appendChild(targetPiece);
-        }
-
-        capturePiece.play();
-      }
-
-      movePiece.play();
-      notify.play();
-
-      // Remove styling for valid moves
-      document
-        .querySelectorAll(".legal")
-        .forEach((cell) => cell.classList.remove("legal"));
-
-      // Put selectedCell and selectedPiece to null again for next turn
-      selectedPiece = null;
-      selectedCell = null;
-
-      // Change turn
-      turn = !turn;
+      promotePawn("black", "blackQueen", cell, targetPiece);
     }
 
     // Other moves
@@ -354,6 +292,37 @@ function movePieces(cell) {
     informationTwo.innerText = "Not a valid move";
     console.log("Not a valid move");
   }
+}
+
+function promotePawn(pawnColor, newPieceName, cell, targetPiece) {
+  const newPiece = new Queen("queen", pawnColor);
+  cell.appendChild(newPiece.renderPiece(newPieceName));
+  remove(selectedPiece);
+  // Display promotion
+  informationOne.innerText = `${pawnColor}Pawn promoted to ${newPieceName}`;
+
+  // Add dead piece to cemetery
+  if (targetPiece) {
+    cell.removeChild(targetPiece);
+    const cemetery = pawnColor === "white" ? whiteCemetery : blackCemetery;
+    cemetery.appendChild(targetPiece);
+    capturePiece.play();
+  }
+
+  movePiece.play();
+  notify.play();
+
+  // Remove styling for valid moves
+  document
+    .querySelectorAll(".legal")
+    .forEach((cell) => cell.classList.remove("legal"));
+
+  // Put selectedCell and selectedPiece to null again for next turn
+  selectedPiece = null;
+  selectedCell = null;
+
+  // Change turn
+  turn = !turn;
 }
 
 function checkTurn() {
