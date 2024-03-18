@@ -54,8 +54,8 @@ const piecesClass = {
 function renderBoard() {
   // prettier-ignore
   const startingPosition = [
-    "blackRook", "", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
-    "blackPawn", "whitePawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
+    "blackRook", "blackBishop", "blackKnight", "blackQueen", "blackKing", "blackKnight", "blackBishop", "blackRook",
+    "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn",
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
     "", "", "", "", "", "", "", "",
